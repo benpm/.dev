@@ -255,16 +255,11 @@ jobs:
           name: nim-logs
           path: logs/nim/
 
-  generate-pages:
+  build-site:
     runs-on: ubuntu-latest
     needs: [build-c, build-cpp, run-javascript, run-python, build-rust, build-nim]
     permissions:
       contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       
@@ -285,6 +280,31 @@ jobs:
         run: |
           cd site
           zola build
+      
+      - name: Upload site artifact for preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-preview
+          path: 'site/public'
+
+  deploy-pages:
+    runs-on: ubuntu-latest
+    needs: [build-site]
+    # Only deploy to GitHub Pages on push to main/master, not on PRs
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-preview
+          path: 'site/public'
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
