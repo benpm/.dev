@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 uint symPair(uint a, uint b) {
   const uint x = a + b + 1;

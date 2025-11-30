@@ -10,6 +10,8 @@ on:
 jobs:
   build-c:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
@@ -52,6 +54,8 @@ jobs:
 
   build-cpp:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
@@ -94,6 +98,8 @@ jobs:
 
   run-javascript:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
@@ -135,6 +141,8 @@ jobs:
 
   run-python:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
@@ -176,11 +184,13 @@ jobs:
 
   build-rust:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
       - name: Setup Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Build and run Rust examples
         id: rust-examples
@@ -220,6 +230,8 @@ jobs:
 
   build-nim:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       
