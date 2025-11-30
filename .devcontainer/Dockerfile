@@ -1,10 +1,11 @@
-# Use latest Ubuntu as the base image
-FROM mcr.microsoft.com/devcontainers/base:ubuntu
+# Use Ubuntu 24.04 (Noble Numbat) as the base image
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install latest LLVM toolchain
+# Install latest LLVM toolchain from the official LLVM apt repository
+# GPG key is fetched over HTTPS from apt.llvm.org
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     gnupg \
