@@ -1,0 +1,25 @@
+# The base URL of the site
+base_url = "https://benpm.github.io/.dev"
+
+# The site title and description
+title = "Code Examples Execution Logs"
+description = "A collection of code snippets and their execution results"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = true
+
+# Whether to build a search index
+build_search_index = false
+
+# The default language for the site
+default_language = "en"
+
+# Enable syntax highlighting
+[markdown]
+highlight_code = true
+highlight_theme = "base16-ocean-dark"
+
+# Taxonomies
+taxonomies = [
+    { name = "languages", feed = false }
+]
