@@ -1,0 +1,42 @@
+# Build artifacts
+*.o
+*.d
+*.obj
+*.exe
+*.out
+
+# C/C++ executables (without extension)
+c/*/main
+c/*/main-debug
+cpp/*/main
+cpp/*/main-debug
+
+# Rust build artifacts
+rust/*/target/
+Cargo.lock
+
+# Node modules
+node_modules/
+package-lock.json
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Replit files
+.replit
+replit.nix
+.breakpoints
+.config/
+poetry.lock
