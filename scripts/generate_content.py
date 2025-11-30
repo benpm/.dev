@@ -21,9 +21,14 @@ LANGUAGES = [
 
 
 def escape_toml_string(s: str) -> str:
-    """Escape a string for use in TOML triple-quoted strings."""
-    # Replace ''' with escaped version to avoid breaking TOML
-    return s.replace("'''", "'\\'\\''")
+    """Escape a string for use in TOML triple-quoted basic strings.
+    
+    Uses multi-line basic strings (triple double quotes) with proper escaping.
+    """
+    # Escape backslashes first, then double quotes
+    s = s.replace("\\", "\\\\")
+    s = s.replace('"', '\\"')
+    return s
 
 
 def create_section_index(content_dir: Path, lang_config: dict) -> None:
@@ -79,19 +84,19 @@ def process_language(logs_dir: Path, content_dir: Path, lang_config: dict) -> No
         source_code_escaped = escape_toml_string(source_code)
         output_escaped = escape_toml_string(output)
         
-        # Create the markdown file
-        md_content = f"""+++
+        # Create the markdown file using triple double quotes for multi-line basic strings
+        md_content = f'''+++
 title = "{example_name}"
 
 [extra]
-source_code = '''
+source_code = """
 {source_code_escaped}
-'''
-output = '''
-{output_escaped}
-'''
-+++
 """
+output = """
+{output_escaped}
+"""
++++
+'''
         
         md_file = output_dir / f"{example_name}.md"
         md_file.write_text(md_content)

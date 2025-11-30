@@ -4,7 +4,8 @@
 
 {% block content %}
 <nav class="nav">
-    <a href="{{ page.ancestors | last }}">← Back</a>
+    {% set parent_section = page.ancestors | last | replace(from="_index.md", to="") %}
+    <a href="{{ get_url(path=parent_section) }}">← Back</a>
 </nav>
 
 <article class="example">
