@@ -1,0 +1,463 @@
+name: Build and Run Examples
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-c:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y gcc
+
+      - name: Build and run C examples
+        id: c-examples
+        run: |
+          mkdir -p logs/c
+          echo "# C Examples Execution Log" > logs/c/summary.md
+          echo "" >> logs/c/summary.md
+          
+          for dir in c/*/; do
+            example=$(basename "$dir")
+            echo "## $example" >> logs/c/summary.md
+            echo '```' >> logs/c/summary.md
+            
+            if [ -f "$dir/main.c" ]; then
+              echo "Building $example..."
+              if gcc -o "/tmp/$example" "$dir/main.c" -lm 2>&1; then
+                echo "Running $example..."
+                timeout 5s "/tmp/$example" 2>&1 | head -100 >> logs/c/summary.md || echo "Timed out or error" >> logs/c/summary.md
+              else
+                echo "Build failed" >> logs/c/summary.md
+              fi
+            fi
+            
+            echo '```' >> logs/c/summary.md
+            echo "" >> logs/c/summary.md
+          done
+          
+          cat logs/c/summary.md
+      
+      - name: Upload C logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: c-logs
+          path: logs/c/
+
+  build-cpp:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++
+
+      - name: Build and run C++ examples
+        id: cpp-examples
+        run: |
+          mkdir -p logs/cpp
+          echo "# C++ Examples Execution Log" > logs/cpp/summary.md
+          echo "" >> logs/cpp/summary.md
+          
+          for dir in cpp/*/; do
+            example=$(basename "$dir")
+            echo "## $example" >> logs/cpp/summary.md
+            echo '```' >> logs/cpp/summary.md
+            
+            if [ -f "$dir/main.cpp" ]; then
+              echo "Building $example..."
+              if g++ -std=c++20 -o "/tmp/$example" "$dir/main.cpp" 2>&1; then
+                echo "Running $example..."
+                timeout 5s "/tmp/$example" 2>&1 | head -100 >> logs/cpp/summary.md || echo "Timed out or error" >> logs/cpp/summary.md
+              else
+                echo "Build failed" >> logs/cpp/summary.md
+              fi
+            fi
+            
+            echo '```' >> logs/cpp/summary.md
+            echo "" >> logs/cpp/summary.md
+          done
+          
+          cat logs/cpp/summary.md
+      
+      - name: Upload C++ logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpp-logs
+          path: logs/cpp/
+
+  run-javascript:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run JavaScript examples
+        id: js-examples
+        run: |
+          mkdir -p logs/javascript
+          echo "# JavaScript Examples Execution Log" > logs/javascript/summary.md
+          echo "" >> logs/javascript/summary.md
+          
+          for dir in javascript/*/; do
+            example=$(basename "$dir")
+            echo "## $example" >> logs/javascript/summary.md
+            echo '```' >> logs/javascript/summary.md
+            
+            if [ -f "$dir/index.js" ]; then
+              echo "Running $example..."
+              timeout 5s node "$dir/index.js" 2>&1 | head -100 >> logs/javascript/summary.md || echo "Timed out or error" >> logs/javascript/summary.md
+            elif [ -f "$dir/scenes/main.js" ]; then
+              echo "(Browser-based example - skipped)" >> logs/javascript/summary.md
+            fi
+            
+            echo '```' >> logs/javascript/summary.md
+            echo "" >> logs/javascript/summary.md
+          done
+          
+          cat logs/javascript/summary.md
+      
+      - name: Upload JavaScript logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: javascript-logs
+          path: logs/javascript/
+
+  run-python:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Python examples
+        id: python-examples
+        run: |
+          mkdir -p logs/python
+          echo "# Python Examples Execution Log" > logs/python/summary.md
+          echo "" >> logs/python/summary.md
+          
+          for dir in python/*/; do
+            example=$(basename "$dir")
+            echo "## $example" >> logs/python/summary.md
+            echo '```' >> logs/python/summary.md
+            
+            if [ -f "$dir/main.py" ]; then
+              echo "Running $example..."
+              cd "$dir"
+              timeout 5s python main.py 2>&1 | head -100 >> "../../logs/python/summary.md" || echo "Timed out or error" >> "../../logs/python/summary.md"
+              cd ../..
+            fi
+            
+            echo '```' >> logs/python/summary.md
+            echo "" >> logs/python/summary.md
+          done
+          
+          cat logs/python/summary.md
+      
+      - name: Upload Python logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-logs
+          path: logs/python/
+
+  build-rust:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build and run Rust examples
+        id: rust-examples
+        run: |
+          mkdir -p logs/rust
+          echo "# Rust Examples Execution Log" > logs/rust/summary.md
+          echo "" >> logs/rust/summary.md
+          
+          for dir in rust/*/; do
+            example=$(basename "$dir")
+            echo "## $example" >> logs/rust/summary.md
+            echo '```' >> logs/rust/summary.md
+            
+            if [ -f "$dir/Cargo.toml" ]; then
+              echo "Building $example..."
+              cd "$dir"
+              if cargo build --release 2>&1; then
+                echo "Running $example..."
+                timeout 5s cargo run --release 2>&1 | head -100 >> "../../logs/rust/summary.md" || echo "Timed out or error" >> "../../logs/rust/summary.md"
+              else
+                echo "Build failed" >> "../../logs/rust/summary.md"
+              fi
+              cd ../..
+            fi
+            
+            echo '```' >> logs/rust/summary.md
+            echo "" >> logs/rust/summary.md
+          done
+          
+          cat logs/rust/summary.md
+      
+      - name: Upload Rust logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-logs
+          path: logs/rust/
+
+  build-nim:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Nim
+        uses: jiro4989/setup-nim-action@v2
+        with:
+          nim-version: 'stable'
+
+      - name: Build and run Nim examples
+        id: nim-examples
+        run: |
+          mkdir -p logs/nim
+          echo "# Nim Examples Execution Log" > logs/nim/summary.md
+          echo "" >> logs/nim/summary.md
+          
+          for dir in nim/*/; do
+            example=$(basename "$dir")
+            echo "## $example" >> logs/nim/summary.md
+            echo '```' >> logs/nim/summary.md
+            
+            if [ -f "$dir/main.nim" ]; then
+              echo "Building $example..."
+              if nim compile --run "$dir/main.nim" 2>&1 | head -100 >> logs/nim/summary.md; then
+                echo "Success" >> /dev/null
+              else
+                echo "Build or run failed" >> logs/nim/summary.md
+              fi
+            fi
+            
+            echo '```' >> logs/nim/summary.md
+            echo "" >> logs/nim/summary.md
+          done
+          
+          cat logs/nim/summary.md
+      
+      - name: Upload Nim logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: nim-logs
+          path: logs/nim/
+
+  generate-pages:
+    runs-on: ubuntu-latest
+    needs: [build-c, build-cpp, run-javascript, run-python, build-rust, build-nim]
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download all logs
+        uses: actions/download-artifact@v4
+        with:
+          path: logs
+      
+      - name: Generate static site
+        run: |
+          mkdir -p site
+          
+          cat > site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Code Examples Execution Logs</title>
+              <style>
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                      max-width: 1200px;
+                      margin: 0 auto;
+                      padding: 20px;
+                      background: #0d1117;
+                      color: #c9d1d9;
+                  }
+                  h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+                  h2 { color: #8b949e; margin-top: 30px; }
+                  .language-section {
+                      background: #161b22;
+                      border: 1px solid #30363d;
+                      border-radius: 6px;
+                      margin: 20px 0;
+                      padding: 20px;
+                  }
+                  .language-title {
+                      color: #58a6ff;
+                      font-size: 1.5em;
+                      margin-bottom: 15px;
+                  }
+                  pre {
+                      background: #0d1117;
+                      border: 1px solid #30363d;
+                      border-radius: 6px;
+                      padding: 16px;
+                      overflow-x: auto;
+                      font-size: 14px;
+                  }
+                  code { color: #e6edf3; }
+                  .example-name { color: #7ee787; font-weight: bold; }
+                  a { color: #58a6ff; text-decoration: none; }
+                  a:hover { text-decoration: underline; }
+                  .nav { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; }
+                  .nav a { 
+                      background: #21262d; 
+                      padding: 10px 20px; 
+                      border-radius: 6px; 
+                      border: 1px solid #30363d;
+                  }
+                  .nav a:hover { background: #30363d; }
+                  .timestamp { color: #8b949e; font-size: 0.9em; }
+              </style>
+          </head>
+          <body>
+              <h1>🧪 Code Examples Execution Logs</h1>
+              <p class="timestamp">Generated: TIMESTAMP_PLACEHOLDER</p>
+              
+              <nav class="nav">
+                  <a href="#c">C</a>
+                  <a href="#cpp">C++</a>
+                  <a href="#javascript">JavaScript</a>
+                  <a href="#python">Python</a>
+                  <a href="#rust">Rust</a>
+                  <a href="#nim">Nim</a>
+              </nav>
+              
+              <div id="c" class="language-section">
+                  <div class="language-title">🔧 C Examples</div>
+                  C_CONTENT_PLACEHOLDER
+              </div>
+              
+              <div id="cpp" class="language-section">
+                  <div class="language-title">⚙️ C++ Examples</div>
+                  CPP_CONTENT_PLACEHOLDER
+              </div>
+              
+              <div id="javascript" class="language-section">
+                  <div class="language-title">🟨 JavaScript Examples</div>
+                  JS_CONTENT_PLACEHOLDER
+              </div>
+              
+              <div id="python" class="language-section">
+                  <div class="language-title">🐍 Python Examples</div>
+                  PYTHON_CONTENT_PLACEHOLDER
+              </div>
+              
+              <div id="rust" class="language-section">
+                  <div class="language-title">🦀 Rust Examples</div>
+                  RUST_CONTENT_PLACEHOLDER
+              </div>
+              
+              <div id="nim" class="language-section">
+                  <div class="language-title">👑 Nim Examples</div>
+                  NIM_CONTENT_PLACEHOLDER
+              </div>
+          </body>
+          </html>
+          EOF
+          
+          # Function to convert markdown to HTML content
+          convert_md_to_html() {
+            local file=$1
+            if [ -f "$file" ]; then
+              # Convert markdown to simple HTML
+              sed -e 's/^## \(.*\)/<h3 class="example-name">\1<\/h3>/g' \
+                  -e 's/^# .*//g' \
+                  -e 's/^```$/<\/code><\/pre>/g' \
+                  -e 's/^```/<pre><code>/g' \
+                  "$file" | tr '\n' '\r' | sed 's/<\/code><\/pre>\r<pre><code>/<\/code><\/pre>\r<pre><code>/g' | tr '\r' '\n'
+            else
+              echo "<p>No logs available</p>"
+            fi
+          }
+          
+          # Replace placeholders
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          sed -i "s/TIMESTAMP_PLACEHOLDER/$TIMESTAMP/g" site/index.html
+          
+          # Generate content for each language
+          C_CONTENT=$(convert_md_to_html "logs/c-logs/summary.md")
+          CPP_CONTENT=$(convert_md_to_html "logs/cpp-logs/summary.md")
+          JS_CONTENT=$(convert_md_to_html "logs/javascript-logs/summary.md")
+          PYTHON_CONTENT=$(convert_md_to_html "logs/python-logs/summary.md")
+          RUST_CONTENT=$(convert_md_to_html "logs/rust-logs/summary.md")
+          NIM_CONTENT=$(convert_md_to_html "logs/nim-logs/summary.md")
+          
+          # Create temporary files for content replacement
+          echo "$C_CONTENT" > /tmp/c_content.html
+          echo "$CPP_CONTENT" > /tmp/cpp_content.html
+          echo "$JS_CONTENT" > /tmp/js_content.html
+          echo "$PYTHON_CONTENT" > /tmp/python_content.html
+          echo "$RUST_CONTENT" > /tmp/rust_content.html
+          echo "$NIM_CONTENT" > /tmp/nim_content.html
+          
+          # Use python for safer replacement
+          python3 << PYEOF
+          with open('site/index.html', 'r') as f:
+              content = f.read()
+          
+          replacements = {
+              'C_CONTENT_PLACEHOLDER': open('/tmp/c_content.html').read(),
+              'CPP_CONTENT_PLACEHOLDER': open('/tmp/cpp_content.html').read(),
+              'JS_CONTENT_PLACEHOLDER': open('/tmp/js_content.html').read(),
+              'PYTHON_CONTENT_PLACEHOLDER': open('/tmp/python_content.html').read(),
+              'RUST_CONTENT_PLACEHOLDER': open('/tmp/rust_content.html').read(),
+              'NIM_CONTENT_PLACEHOLDER': open('/tmp/nim_content.html').read(),
+          }
+          
+          for placeholder, replacement in replacements.items():
+              content = content.replace(placeholder, replacement)
+          
+          with open('site/index.html', 'w') as f:
+              f.write(content)
+          PYEOF
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'site'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
