@@ -1,103 +1,91 @@
 # .dev
 
-A collection of code examples and experiments organized by programming language.
+A development container configured for C++ development with the latest LLVM toolchain.
 
-[![Build and Run Examples](https://github.com/benpm/.dev/actions/workflows/build-and-run.yml/badge.svg)](https://github.com/benpm/.dev/actions/workflows/build-and-run.yml)
+## Features
 
-## Languages
+- **Latest Ubuntu** base image
+- **Latest LLVM** toolchain including:
+  - `clang` / `clang++` - C/C++ compiler
+  - `clangd` - Language server for IDE features
+  - `clang-format` - Code formatter
+  - `clang-tidy` - Static analysis / linter
+  - `lldb` - Debugger
+  - `lld` - Linker
+- **VS Code Extensions**:
+  - [vscode-clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) - C++ language support via clangd
+  - [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb) - Native debugger based on LLDB
+  - CMake Tools - CMake build system support
 
-### C (`c/`)
-- `angles` - atan2 function examples
-- `AstonishingSqueakyBusinesses` - C example
-- `Bad-Comparison` - C example
-- `cursed-C-reverse-array-indexing` - Array indexing tricks
-- `execvp` - Process execution example
-- `ExpertOverdueStatistics` - C example
-- `extractexponent` - Exponent extraction
-- `FirebrickConsiderableGigahertz` - C example
-- `GiftedYellowgreenEmulation` - Drawing example
-- `LightsalmonTrivialDoom` - C example
-- `RedundantUnawareProgramminglanguages` - C example
-- `RipeMajesticLinks` - C example
-- `RipeMajesticLinks-1` - C example
-- `SpatialTeemingAccounting` - C example
-- `WigglyImaginativeWatch` - C example
-- `WrathfulLoathsomeCalculators` - C example
+## Getting Started
 
-### C++ (`cpp/`)
-- `booleanordering` - Boolean ordering experiments
-- `C20` - C++20 symmetric pairing function
-- `doubleinheritance` - Double inheritance example
-- `FastRaggedLibrary` - C++ example
-- `FunctionalRotatingInstructions` - C++ example
-- `LightblueMotionlessHexagons` - C++ example
-- `Reference-Slicing` - Reference slicing demonstration
-- `sharedptrfunkiness` - Shared pointer experiments
-- `slot-trie` - Slot trie data structure
-- `symmetric-pairing-function` - Symmetric pairing function
-- `templatededuction` - Template deduction examples
-- `transformmap` - Transform map examples
-- `Type-safe-shared-methods` - Type-safe method examples
-- `typechecking` - Type checking examples
-- `typemap` - Type map examples
-- `unorderedsetcollisions` - Unordered set collision examples
-- `WideSparseKilobyte` - C++ example
+### Using with GitHub Codespaces
 
-### JavaScript (`javascript/`)
-- `Array-Interpose` - Array interposition utility
-- `constanttimeneighborfindingquadtrees` - Quadtree neighbor finding
-- `kaboomtest` - Kaboom.js game framework test
-- `linearquadtree` - Linear quadtree implementation
-- `rectangledist` - Rectangle distance calculations
+1. Click the green "Code" button on this repository
+2. Select "Open with Codespaces"
+3. Click "New codespace"
 
-### Python (`python/`)
-- `AggressiveHummingConferences` - Regex parsing example
-- `HastyOnlyMemorypool` - Matplotlib plotting
-- `largesttwofactors` - Largest two factors algorithm
-- `loganhelp` - Function examples
-- `RecklessElatedCallback` - Python syntax example
-- `ShockedSoupyCoordinate` - Python example
-- `signeddist` - Signed distance function
-- `spherecoords` - Spherical coordinate conversion
+### Using with VS Code Dev Containers
 
-### Rust (`rust/`)
-- `vecsnstuff` - Rust Hello World
+1. Install [Docker](https://www.docker.com/products/docker-desktop)
+2. Install [VS Code](https://code.visualstudio.com/) and the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+3. Clone this repository
+4. Open the repository in VS Code
+5. When prompted, click "Reopen in Container" (or use the command palette: "Dev Containers: Reopen in Container")
 
-### Nim (`nim/`)
-- `EqualBeautifulDebugging` - Nim counting example
+## Quick Start
 
-## Building and Running
+Once the devcontainer is running, try compiling and running the example:
 
-The GitHub Actions workflow automatically builds and runs all examples on every push. View the execution logs at the [GitHub Pages site](https://benpm.github.io/.dev/).
-
-### Local Development
-
-**C:**
 ```bash
-gcc -o main c/<example>/main.c -lm && ./main
+# Compile with C++23 features
+clang++ -std=c++23 -o example example.cpp
+
+# Run the example
+./example
 ```
 
-**C++:**
+## Interactive C++ with clang-repl
+
+For quick experimentation, use `clang-repl`:
+
 ```bash
-g++ -std=c++20 -o main cpp/<example>/main.cpp && ./main
+clang-repl
 ```
 
-**JavaScript:**
-```bash
-node javascript/<example>/index.js
+Then type C++ code interactively:
+
+```cpp
+clang-repl> #include <iostream>
+clang-repl> std::cout << "Hello, World!" << std::endl;
+Hello, World!
+clang-repl> int x = 42;
+clang-repl> x * 2
+(int) 84
 ```
 
-**Python:**
+## Building Projects
+
+For larger projects, use CMake:
+
 ```bash
-python python/<example>/main.py
+mkdir build && cd build
+cmake -G Ninja ..
+ninja
 ```
 
-**Rust:**
+## Code Formatting
+
+Format your code using clang-format:
+
 ```bash
-cd rust/<example> && cargo run
+clang-format -i your_file.cpp
 ```
 
-**Nim:**
+## Static Analysis
+
+Run clang-tidy for static analysis:
+
 ```bash
-nim compile --run nim/<example>/main.nim
+clang-tidy your_file.cpp -- -std=c++23
 ```

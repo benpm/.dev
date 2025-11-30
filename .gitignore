@@ -1,45 +1,20 @@
 # Build artifacts
+build/
 *.o
-*.d
-*.obj
-*.exe
 *.out
 
-# C/C++ executables (without extension)
-c/*/main
-c/*/main-debug
-cpp/*/main
-cpp/*/main-debug
-
-# Rust build artifacts
-rust/*/target/
-Cargo.lock
-
-# Node modules
-node_modules/
-package-lock.json
-
-# Python bytecode
-__pycache__/
-*.pyc
-*.pyo
-
-# IDE files
+# Editor directories
 .vscode/
-.idea/
-*.swp
-*.swo
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# CodeQL artifacts
+_codeql_detected_source_root
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Replit files
-.replit
-replit.nix
-.breakpoints
-.config/
-poetry.lock
-
-# CodeQL artifacts
-_codeql_detected_source_root
+# Compiled binaries
+example
