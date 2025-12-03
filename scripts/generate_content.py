@@ -6,6 +6,7 @@ and generates markdown files for Zola to process.
 """
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -19,12 +20,22 @@ LANGUAGES = [
     {"id": "nim", "title": "Nim", "emoji": "👑", "lang": "nim", "source_ext": "nim"},
 ]
 
+# ANSI escape code pattern
+ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+
+
+def strip_ansi_codes(s: str) -> str:
+    """Remove ANSI escape codes from a string."""
+    return ANSI_ESCAPE.sub('', s)
+
 
 def escape_toml_string(s: str) -> str:
     """Escape a string for use in TOML triple-quoted basic strings.
     
     Uses multi-line basic strings (triple double quotes) with proper escaping.
     """
+    # Strip ANSI escape codes first
+    s = strip_ansi_codes(s)
     # Escape backslashes first, then double quotes
     s = s.replace("\\", "\\\\")
     s = s.replace('"', '\\"')
