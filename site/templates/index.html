@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="nav">
+    {% set sections = get_section(path="_index.md") %}
+    {% for section in sections.subsections %}
+        {% set s = get_section(path=section) %}
+        <a href="{{ s.permalink }}">{{ s.title }}</a>
+    {% endfor %}
+</nav>
+
+<div class="languages">
+    {% for section in sections.subsections %}
+        {% set s = get_section(path=section) %}
+        <div id="{{ s.extra.id | default(value=s.title | lower) }}" class="language-section">
+            <div class="language-title">{{ s.extra.emoji | default(value='📁') }} {{ s.title }} Examples</div>
+            {% for page in s.pages %}
+                <article class="example">
+                    <h3 class="example-name">{{ page.title }}</h3>
+                    
+                    <details open>
+                        <summary>Source Code</summary>
+                        <pre><code class="{{ s.extra.lang | default(value='text') }}">{{ page.extra.source_code | safe }}</code></pre>
+                    </details>
+                    
+                    <details open>
+                        <summary>Output</summary>
+                        <pre><code>{{ page.extra.output | safe }}</code></pre>
+                    </details>
+                </article>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

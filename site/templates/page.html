@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} - {{ config.title }}{% endblock %}
+
+{% block content %}
+<nav class="nav">
+    {% set parent_section = page.ancestors | last | replace(from="_index.md", to="") %}
+    <a href="{{ get_url(path=parent_section) }}">← Back</a>
+</nav>
+
+<article class="example">
+    <h2 class="example-name">{{ page.title }}</h2>
+    
+    <details open>
+        <summary>Source Code</summary>
+        <pre><code>{{ page.extra.source_code | safe }}</code></pre>
+    </details>
+    
+    <details open>
+        <summary>Output</summary>
+        <pre><code>{{ page.extra.output | safe }}</code></pre>
+    </details>
+</article>
+{% endblock %}

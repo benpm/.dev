@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ section.title }} - {{ config.title }}{% endblock %}
+
+{% block content %}
+<nav class="nav">
+    <a href="{{ get_url(path='/') }}">← Back to Home</a>
+</nav>
+
+<div class="language-section">
+    <div class="language-title">{{ section.extra.emoji | default(value='📁') }} {{ section.title }} Examples</div>
+    {% for page in section.pages %}
+        <article class="example">
+            <h3 class="example-name">{{ page.title }}</h3>
+            
+            <details open>
+                <summary>Source Code</summary>
+                <pre><code class="{{ section.extra.lang | default(value='text') }}">{{ page.extra.source_code | safe }}</code></pre>
+            </details>
+            
+            <details open>
+                <summary>Output</summary>
+                <pre><code>{{ page.extra.output | safe }}</code></pre>
+            </details>
+        </article>
+    {% endfor %}
+</div>
+{% endblock %}
