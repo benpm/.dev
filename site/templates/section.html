@@ -13,15 +13,17 @@
         <article class="example">
             <h3 class="example-name">{{ page.title }}</h3>
             
-            <details open>
-                <summary>Source Code</summary>
-                <pre><code class="{{ section.extra.lang | default(value='text') }}">{{ page.extra.source_code | safe }}</code></pre>
-            </details>
-            
-            <details open>
-                <summary>Output</summary>
-                <pre><code>{{ page.extra.output | safe }}</code></pre>
-            </details>
+            <div class="code-output-container">
+                <details open>
+                    <summary>Source Code</summary>
+                    <pre><code class="{{ section.extra.lang | default(value='text') }}">{{ page.extra.source_code | safe }}</code></pre>
+                </details>
+                
+                <details open>
+                    <summary>Output</summary>
+                    <pre><code>{{ page.extra.output | safe }}</code></pre>
+                </details>
+            </div>
         </article>
     {% endfor %}
 </div>
