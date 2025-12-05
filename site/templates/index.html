@@ -15,16 +15,16 @@
         <div id="{{ s.extra.id | default(value=s.title | lower) }}" class="language-section">
             <div class="language-title">{{ s.extra.emoji | default(value='📁') }} {{ s.title }} Examples</div>
             {% for page in s.pages %}
-                <article class="example">
+                <article class="example style-scrollbar">
                     <h3 class="example-name">{{ page.title }}</h3>
                     
                     <div class="code-output-container">
-                        <details open>
+                        <details class="code-source" open>
                             <summary>Source Code</summary>
                             <pre><code class="{{ s.extra.lang | default(value='text') }}">{{ page.extra.source_code | safe }}</code></pre>
                         </details>
                         
-                        <details open>
+                        <details class="code-output" open>
                             <summary>Output</summary>
                             <pre><code>{{ page.extra.output | safe }}</code></pre>
                         </details>
