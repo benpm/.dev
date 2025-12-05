@@ -86,8 +86,21 @@ header h1 a:hover {
     margin-top: 0;
 }
 
-details {
+.code-output-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
     margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+    .code-output-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+details {
+    margin: 0;
 }
 
 summary {
